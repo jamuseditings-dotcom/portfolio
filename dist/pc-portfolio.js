@@ -6,7 +6,7 @@ import {createPCGlow} from './pc-new-glow.js?v=screen-colour-2';
 import {GLTFLoader} from './vendor/GLTFLoader.js';
 import {createOpeningDriver} from './anime-opening-driver.js?v=anime-4';
 import {createOpeningHandoff,openingOpacity} from './opening-handoff.js?v=1';
-import {monitorPlan,createRoomResolution} from './room-performance.js?v=1';
+import {monitorPlan,createRoomResolution} from './room-performance.js?v=2';
 export async function createStudio(canvas,assets,onProject,onAbout,onContact){
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.AgXToneMapping;
@@ -50,7 +50,7 @@ export async function createStudio(canvas,assets,onProject,onAbout,onContact){
   }
   state=model.update(p,time,width/height,reduced);active=state.active;
   const outside=p>=.35||(p>.16&&edgeSamples.some(point=>{edgeRay.setFromCamera(point,model.camera);return edgeRay.intersectObject(model.screen,false).length===0;}));
-  if(p>=.35&&resolution.sample(time-previousTime))sizeRoom();
+  if(opacity<1&&resolution.sample(time-previousTime))sizeRoom();
   const dt=Math.max(0,Math.min(.05,time-previousTime));previousTime=time;
   treatment=p<=.16?0:T.MathUtils.damp(treatment,outside?1:0,10,dt);
   glow?.setTreatment(treatment);glow?.setReveal(revealEffects(p));if(opacity<1||!roomWarmed){if(glow)glow.render(model.scene,model.camera);else renderer.render(model.scene,model.camera);roomWarmed=true;}return state;
