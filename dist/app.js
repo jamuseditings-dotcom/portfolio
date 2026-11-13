@@ -6,8 +6,8 @@ const scrollBehavior=()=>reduced?'instant':'smooth';
 const staticMode=()=>reduced||!studio;
 // Allocate scroll distance to the opening, camera moves, and readable project holds.
 const scrollKeyframes=[
- [0,0],[.24,.16],[.39,.35],[.47,.49],[.53,.59],[.61,.63],
- [.66,.69],[.74,.73],[.79,.79],[.87,.81],[.91,.91],[.97,.985],[1,1],
+ [0,0],[.19,.16],[.38,.35],[.45,.49],[.53,.59],[.59,.63],
+ [.65,.69],[.70,.73],[.76,.79],[.81,.81],[.90,.91],[.98,.985],[1,1],
 ];
 function mapScroll(value,input){
  const end=scrollKeyframes.findIndex(frame=>value<=frame[input]);
@@ -37,7 +37,13 @@ function render(now){
  const opening=studio.getOpeningState();
  const revealing=!skipOpening&&progress<=.17&&target>.16&&!opening.revealReady;
  const visualTarget=revealing?Math.min(target,.16):target;
- progress=mix(progress,visualTarget,1-Math.exp(-delta/(progress<=.16?175:65)));if(Math.abs(progress-visualTarget)<.0001)progress=visualTarget;
+ const inOpening=progress<=.16&&visualTarget<=.16;
+ const easedStep=(visualTarget-progress)*(1-Math.exp(-delta/(inOpening?175:150)));
+ // A fast wheel gesture can cross several stops. Limit camera travel per frame
+ // once the studio is visible so the camera still follows the authored path.
+ const maxStep=inOpening?1:delta*.00038;
+ progress+=Math.max(-maxStep,Math.min(maxStep,easedStep));
+ if(Math.abs(progress-visualTarget)<.0001)progress=visualTarget;
  if(progress>.2)skipOpening=false;
  const elapsed=Math.max(0,(now-start)/1000);if(progress<.061&&!skipOpening)landedAt=null;if(progress>=.0763&&landedAt===null)landedAt=now;
  const state=studio.render(progress,elapsed,landedAt===null?-1:(now-landedAt)/1000,false);
