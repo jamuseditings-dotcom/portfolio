@@ -1,0 +1,12 @@
+import fs from 'node:fs';import zlib from 'node:zlib';import * as T from '../dist/vendor/three.module.min.js';import {GLTFLoader} from '../dist/vendor/GLTFLoader.js';import {makePCMaterials} from '../dist/pc-new-materials.js';import {buildStudio} from '../dist/pc-portfolio-world.js';
+const root=new URL('../dist/assets/pc-new/',import.meta.url),meta=JSON.parse(fs.readFileSync(new URL('scene.json',root),'utf8'));
+const bytes=zlib.gunzipSync(Buffer.concat(meta.chunks.map(p=>fs.readFileSync(new URL(p,root)))));
+const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+T.TextureLoader.prototype.loadAsync=async()=>new T.Texture();
+const model=buildStudio({source:gltf.scene,meta,liveMaterials:await makePCMaterials(meta),clips:gltf.animations});
+let nodes=0,staticNodes=0;model.scene.traverse(o=>{nodes++;if(!o.matrixAutoUpdate)staticNodes++;});
+for(let i=0;i<150;i++)model.update(.4,i/60,16/9);
+let composes=0;const original=T.Object3D.prototype.updateMatrix;T.Object3D.prototype.updateMatrix=function(){composes++;return original.call(this);};
+const start=performance.now();for(let i=0;i<600;i++)model.update(.4,i/60,16/9);const ms=performance.now()-start;
+T.Object3D.prototype.updateMatrix=original;
+console.log(JSON.stringify({nodes,staticNodes,frames:600,updateMs:+ms.toFixed(2),meanUpdateMs:+(ms/600).toFixed(3),transformComposesPerFrame:composes/600,note:'CPU scene-update benchmark only; not GPU FPS'}));

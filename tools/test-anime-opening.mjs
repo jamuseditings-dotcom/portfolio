@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';
+let draws=0;const ctx=new Proxy({createPattern:()=>({}),createRadialGradient:()=>({addColorStop(){}})}, {get:(o,k)=>k in o?o[k]:(...args)=>{draws++;},set:(o,k,v)=>(o[k]=v,true)});
+const canvas=()=>({width:1280,height:630,clientWidth:1280,clientHeight:630,getContext:()=>ctx});globalThis.document={createElement:()=>canvas()};globalThis.Path2D=class{constructor(d){this.d=d;}};
+const {createOpeningDriver}=await import('../dist/anime-opening-driver.js');const {JAMU_PATHS}=await import('../dist/anime-opening.js');assert.equal(JAMU_PATHS.letters.length,4);assert.equal(JAMU_PATHS.flameCels.length,6);
+const driver=createOpeningDriver(canvas());driver.resize(1280,630,16/9);let t=0;const tick=(p,n=1)=>{for(let i=0;i<n;i++){t+=1/60;driver.render(t,p);}};
+const nativeCanvas=canvas(),nativeDriver=createOpeningDriver(nativeCanvas);nativeDriver.resize(1920,1080,null,2);assert.equal(nativeCanvas.width,3840);assert.equal(nativeCanvas.height,2160);nativeDriver.dispose();
+tick(0,75);assert.equal(driver.getState().state,'intro');assert.equal(driver.getState().revealReady,false);
+tick(.03,75);assert.equal(driver.getState().entryReady,true);assert.equal(driver.getState().state,'drifting');const count=draws;tick(.03,20);assert.ok(draws>count,'Background keeps drawing at stationary scroll');
+const states=new Set();for(let i=0;i<180;i++){tick(.9);states.add(driver.getState().state);}assert.ok(states.has('approaching'));assert.ok(states.has('impact'));assert.ok(states.has('settled'));assert.equal(driver.getState().revealReady,true);
+tick(0,120);assert.equal(driver.getState().state,'intro');assert.equal(driver.getState().revealReady,false);
+driver.render(0,0);assert.equal(driver.getState().state,'intro');driver.resize(720,1280,9/16);tick(.16,220);assert.equal(driver.getState().settled,true);
+const host=fs.readFileSync(new URL('../dist/pc-portfolio.js',import.meta.url),'utf8');assert.ok(host.includes('createOpeningDriver'));assert.ok(!host.includes('drawScene('));const engine=fs.readFileSync(new URL('../dist/anime-opening.js',import.meta.url),'utf8');assert.ok(!/https:|requestAnimationFrame|window\.scroll/.test(engine));
+console.log('PASS: uploaded art paths, continuous background, scroll entry, fast-scroll impact/settle, reverse/replay, portrait resize, local-only canvas integration. Canvas commands mocked; not a pixel test.');

@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import * as T from '../dist/vendor/three.module.min.js';
+import {createPCGlow} from '../dist/pc-new-glow.js';
+const calls=[];
+const source=readFileSync(new URL('../dist/pc-new-glow.js',import.meta.url),'utf8');
+assert.ok(source.includes('gl_FragColor.rgb=mix(baseColor,gl_FragColor.rgb,treatment);'));
+assert.ok(source.indexOf('#include <tonemapping_fragment>')<source.indexOf('gl_FragColor.rgb=mix(baseColor'));
+assert.ok(source.indexOf('gl_FragColor.rgb=mix(baseColor')<source.indexOf('#include <colorspace_fragment>'));
+const renderer={toneMapping:T.AgXToneMapping,setRenderTarget(target){this.target=target;},render(scene){calls.push({target:this.target,material:scene.children[0]?.material,mapping:this.toneMapping});}};
+const glow=createPCGlow(renderer);glow.setSize(1440,900);glow.render(new T.Scene(),new T.Camera());
+glow.setTreatment(0);assert.equal(calls.at(-1).material.uniforms.treatment.value,0);
+glow.setTreatment(1);assert.equal(calls.at(-1).material.uniforms.treatment.value,1);
+assert.equal(calls.length,7);assert.equal(calls[0].target.width,1440);assert.equal(calls[1].target.width,360);assert.equal(calls[5].target.width,180);assert.equal(calls.at(-1).material.uniforms.pixelSize.value.x,1/1440);
+assert.equal(calls[0].mapping,T.NoToneMapping);assert.equal(calls.at(-1).mapping,T.AgXToneMapping);assert.equal(calls.at(-1).target,null);
+assert.equal(calls.at(-1).material.uniforms.strength.value,.16);glow.setEnabled(false);assert.equal(calls.at(-1).material.uniforms.strength.value,0);
+assert.equal(renderer.toneMapping,T.AgXToneMapping);console.log('PASS: HDR bloom order, resize, single display transform and A/B toggle (not GPU compilation).');
+glow.setReveal(0);assert.equal(calls.at(-1).material.uniforms.aberration.value,0);assert.equal(calls.at(-1).material.uniforms.vibrance.value,0);glow.setReveal(1);assert.equal(calls.at(-1).material.uniforms.aberration.value,1);assert.equal(calls.at(-1).material.uniforms.vibrance.value,.07);

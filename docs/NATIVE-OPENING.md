@@ -1,0 +1,7 @@
+# Native 2D opening
+
+The opening now renders directly into a visible DOM Canvas2D canvas at viewport size and up to 2x device pixel ratio (bounded by the GPU texture-size limit). It uses the uploaded animation engine's original responsive layout, without the previous monitor-aspect override. Foreground grain remains removed as requested.
+
+That same live canvas is the monitor texture: one driver, one elapsed clock, one set of random stars and particles, one impact state. No separate simulation or restart occurs at handoff. The curved screen uses homogeneous projective coordinates calibrated to the opening camera during resize. The native layer fades out between progress .16 and .178, before the room becomes exposed. Reverse scrolling restores the native layer; replay resets the shared driver. Screen material is unlit and untone-mapped. Colour treatment still starts when the room first appears; header and aberration remain delayed to the settled desk.
+
+Validation: native 1920x1080 at DPR 2 produces 3840x2160 backing pixels. Shared texture, projection alignment in landscape/portrait/ultrawide, opacity endpoints, reset/replay, fast scrolling, PC NEW scene/camera preservation and glow tests pass. Geometry/math and mocked Canvas tests are not GPU visual verification. The full WebGL handoff needs visual review on a GPU-enabled browser; the earlier cloud browser could not render WebGL.

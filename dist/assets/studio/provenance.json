@@ -1,0 +1,18 @@
+{
+  "source": "pc.blend",
+  "sha256": "b05ba29ae2f98fbad056474b18aa5811a8b9ad7f6c24abb4bac42b44027bf332",
+  "blender": "5.2.2 LTS",
+  "missing": [
+    "red-grunge-background.jpg"
+  ],
+  "sun": {
+    "energy": 1.65,
+    "directionZUp": [
+      0.6601681,
+      0.0790882,
+      -0.7469426
+    ]
+  },
+  "note": "Source geometry and packed glass maps. Eevee NPR shaders adapted in studio-materials.js. Wall deliberately replaced with seamless charcoal plaster. Source file untouched.",
+  "wall": "Plain charcoal plaster, procedural seamless texture requested by user."
+}

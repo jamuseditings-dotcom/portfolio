@@ -1,0 +1,5 @@
+import assert from 'node:assert/strict';import * as T from '../dist/vendor/three.module.min.js';import {smoothCharacter} from '../dist/pc-smooth.js';
+const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute([0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,1,0,0],3));g.setAttribute('uv',new T.Float32BufferAttribute([0,0,1,0,0,1,1,1,0,0,1,0],2));const positions=g.attributes.position.array.slice(),uv=g.attributes.uv.array.slice();const m=new T.MeshBasicMaterial();m.name='BODY';const o=new T.SkinnedMesh(g,m),root=new T.Group();root.add(o);
+assert.equal(smoothCharacter(root),1);assert.deepEqual(g.attributes.position.array,positions);assert.deepEqual(g.attributes.uv.array,uv);
+const a=new T.Vector3().fromBufferAttribute(g.attributes.normal,0),b=new T.Vector3().fromBufferAttribute(g.attributes.normal,3);assert.ok(a.distanceTo(b)<1e-6);assert.ok(Math.abs(a.y-Math.SQRT1_2)<1e-6&&Math.abs(a.z-Math.SQRT1_2)<1e-6);assert.equal(smoothCharacter(root),0);
+console.log('PASS: smooth normals join split vertices without altering geometry or UVs; repeat-safe.');
