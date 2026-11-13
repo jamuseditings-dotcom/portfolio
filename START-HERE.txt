@@ -1,0 +1,36 @@
+JAMU WEBSITE - COMPLETE EXPORT
+
+Source version: f1f6f464029faec8807be96b338d1792009ef9bf
+
+dist/ contains the website, JavaScript, styles, fonts, textures, 3D scene
+files and all included demo/editor pages. docs/, scripts/ and tools/
+contain implementation notes, asset scripts and checks.
+
+RUN LOCALLY
+Extract the ZIP. Open a terminal in the JAMU-Website folder and run:
+
+    python3 -m http.server 8000 --directory dist
+
+On Windows, if python3 is unavailable, use:
+
+    py -m http.server 8000 --directory dist
+
+Then open http://localhost:8000 in a modern browser with WebGL enabled.
+Do not double-click index.html: modules and scene loading require HTTP.
+Stop the server with Ctrl+C. Python 3 must be installed for these commands.
+
+HOST ELSEWHERE
+Upload the CONTENTS of dist/ to a static web host. Keep asset paths intact.
+No build step is required. A host serving .gz model chunks should preserve
+the original files and headers expected by the included loader.
+
+Main page: index.html
+Lighting/scene preview: pc-new.html
+About page: about.html
+Opening animation preview: opening-test.html
+
+This is an unchanged export of the current saved website, not a new build.
+Copy discussed in chat is not automatically added to the exported code.
+CMS/project editor proposals are not implemented in this version.
+Original Blender authoring files are not part of this web source export.
+Hosting account credentials, Git history and local caches are excluded.
