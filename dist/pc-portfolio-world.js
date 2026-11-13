@@ -39,13 +39,17 @@ export function buildStudio({source,meta,liveMaterials,clips=[],screenTexture=nu
  mesh(new T.PlaneGeometry(14,12),liveMaterials.get('wall'),scene,-1.608,12.24,-1.4);
  const projectMeshes=[];
  workStops.forEach((p,i)=>{const group=new T.Group();group.position.set(p.x,p.y,-1.18);group.rotation.z=p.angle;scene.add(group);
-  mesh(new T.BoxGeometry(3.02,1.76,.028),basic('#090909'),group);
-  const art=mesh(new T.PlaneGeometry(2.9,1.63125),basic('#ffffff',projectTextures[i]),group,0,0,.026);art.userData.project=p.id;projectMeshes.push(art);
-  if(labelTextures[i]){const m=basic('#ffffff',labelTextures[i]);m.transparent=true;mesh(new T.PlaneGeometry(2.9,.351),m,group,0,-1.12,.04);}
-  for(const x of [-1.3,1.3])mesh(new T.BoxGeometry(.28,.09,.008),basic('#b7ad85'),group,x,.85,.04).rotation.z=x<0?-.4:.3;
+  mesh(new T.BoxGeometry(3.02,2.48,.028),basic('#090909'),group,0,-.04);
+  function addProjectPanel(texture,width,height,y){
+   if(!texture)return;
+   const panel=mesh(new T.PlaneGeometry(width,height),basic('#ffffff',texture),group,0,y,.026);
+   panel.userData.project=p.id;projectMeshes.push(panel);
+  }
+  addProjectPanel(projectTextures[i],2.9,1.63125,0);
+  addProjectPanel(headingTexture,2.9,.32,1.00);
+  addProjectPanel(labelTextures[i],2.9,.42,-1.045);
  });
  const cm=new T.Matrix4().set(...meta.camera.matrix.flat()).premultiply(new T.Matrix4().makeRotationX(-Math.PI/2)),desk=new T.Vector3(),deskQuat=new T.Quaternion();cm.decompose(desk,deskQuat,new T.Vector3());
- let worksHeading=null;if(headingTexture){const mat=basic('#ffffff',headingTexture);mat.transparent=true;worksHeading=mesh(new T.PlaneGeometry(2.9,.30),mat,scene,workStops[0].x,workStops[0].y-1.7,-1.13);worksHeading.name='selected-works-heading';}
  const deskLook=desk.clone().add(new T.Vector3(0,0,-3).applyQuaternion(deskQuat)),fov=2*T.MathUtils.radToDeg(Math.atan(Math.tan(T.MathUtils.degToRad(meta.camera.fov/2))/(meta.render.width/meta.render.height))),camera=new T.PerspectiveCamera(fov,1,.008,80);
  const tracks=clips.flatMap(c=>c.tracks),fans=tracks.filter(t=>/^Object_528/.test(t.name)),body=tracks.filter(t=>!/^Object_528|^FANS|^Camera/.test(t.name)),pose=new T.AnimationMixer(source),spin=new T.AnimationMixer(source);
  if(body.length){const a=pose.clipAction(new T.AnimationClip('PC NEW saved pose',-1,body));a.setLoop(T.LoopOnce,1);a.clampWhenFinished=true;a.play();pose.setTime((meta.frame-meta.frameStart)/meta.fps);}
@@ -62,14 +66,13 @@ export function buildStudio({source,meta,liveMaterials,clips=[],screenTexture=nu
   const tan=Math.tan(T.MathUtils.degToRad(deskFov/2)),distance=Math.min(display.size.y,display.size.x/aspect)/(2*Math.tan(Math.PI/8))*.85;
   const start=display.center.clone().add(new T.Vector3(0,0,distance));let position=start.clone(),look=display.center.clone();
   if(raw>.16){const t=ease((raw-.16)/.19);position=curved(start,new T.Vector3(-3.9,2.45,.5),new T.Vector3(-4,2.65,2.7),desk,t);look.lerp(deskLook,t);}
-  const wallDistance=Math.max(4.5,3.65/(2*tan*aspect)),wp=i=>new T.Vector3(workStops[i].x,workStops[i].y-.08,-1.18+wallDistance),wl=i=>new T.Vector3(workStops[i].x,workStops[i].y-.12,-1.18);
+  const wallDistance=Math.max(4.5,3.65/(2*tan*aspect),2.9/(2*tan)),wp=i=>new T.Vector3(workStops[i].x,workStops[i].y-.08,-1.18+wallDistance),wl=i=>new T.Vector3(workStops[i].x,workStops[i].y-.12,-1.18);
   if(raw>.49){const t=ease((raw-.49)/.10);position=desk.clone().lerp(wp(0),t);look=deskLook.clone().lerp(wl(0),t);}
   if(raw>.63){const t=ease((raw-.63)/.06);position=wp(0).lerp(wp(1),t);look=wl(0).lerp(wl(1),t);}
   if(raw>.73){const t=ease((raw-.73)/.06);position=wp(1).lerp(wp(2),t);look=wl(1).lerp(wl(2),t);}
   if(raw>.81){const t=ease((raw-.81)/.10);position=wp(2).lerp(desk,t);look=wl(2).lerp(deskLook,t);}
   if(raw>.91){const t=ease((raw-.91)/.075),phoneLook=new T.Vector3(phoneCenter.x,phoneBounds.max.y+.002,phoneCenter.z),phonePos=phoneLook.clone().add(new T.Vector3(0,1,.25).normalize().multiplyScalar(Math.max(.36,.27/(2*tan*aspect))));position=curved(desk,new T.Vector3(-3.8,4.2,3),new T.Vector3(.6,4.2,.8),phonePos,t);look=deskLook.clone().lerp(phoneLook,t);}
   camera.position.copy(position);camera.lookAt(look);camera.updateMatrixWorld();scene.updateMatrixWorld();
-  if(worksHeading)worksHeading.visible=raw>.49&&raw<.81;
   const point=head?head.getWorldPosition(new T.Vector3()):new T.Vector3(-1.9,2.65,1.4);point.y+=.18;point.project(camera);
   return {active:raw>=.59&&raw<=.63?0:raw>=.69&&raw<=.73?1:raw>=.79&&raw<=.81?2:-1,contactVisible:raw>.965,aboutVisible:(raw>.33&&raw<.51)||(raw>.875&&raw<.925),aboutPoint:{x:(point.x+1)/2,y:(1-point.y)/2}};
  }

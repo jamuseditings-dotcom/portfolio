@@ -59,7 +59,7 @@ function render(now){
  $('#phone-contact').hidden=!state.contactVisible;schedule();
 }
 async function loadImage(src){const image=new Image();image.src=src;await image.decode();return image;}
-async function initStudio(){if(studio||reduced)return;try{const {createStudio}=await import('./pc-portfolio.js?v=pc-main-12');studio=await createStudio($('#studio-canvas'),assets,id=>openProject(id,$('#wall-project')),()=>{location.href='about.html';},()=>{location.href='mailto:ganijamu@gmail.com';});stage.classList.add('has-studio');}catch(error){console.warn('Using accessible static portfolio:',error);}}
+async function initStudio(){if(studio||reduced)return;try{const {createStudio}=await import('./pc-portfolio.js?v=featured-works-1');studio=await createStudio($('#studio-canvas'),assets,id=>openProject(id,$('#wall-project')),()=>{location.href='about.html';},()=>{location.href='mailto:ganijamu@gmail.com';});stage.classList.add('has-studio');}catch(error){console.warn('Using accessible static portfolio:',error);}}
 const sceneFiles=['desk-halftone.webp','planet-halftone.webp','letters-layer.svg','flame-1.svg',...Array.from({length:6},(_,i)=>`flame-${i+1}.svg`),...'jamu'.split('').map(n=>`letter-${n}.svg`)];
 Promise.all(sceneFiles.map(n=>loadImage('assets/'+n))).then(async images=>{
  assets={desk:images[0],planet:images[1],letters:images[2],meteor:images[3],flameFrames:images.slice(4,10),letterFrames:images.slice(10,14)};

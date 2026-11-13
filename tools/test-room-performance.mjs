@@ -8,5 +8,5 @@ const quality=createRoomResolution(1920,1080,2);const initial=quality.ratio;
 for(let i=0;i<500;i++)quality.sample(1/60);assert.equal(quality.ratio,initial);
 for(let i=0;i<1200;i++)quality.sample(1/25);assert.ok(quality.ratio<initial);assert.ok(quality.ratio>=initial*.75);
 const host=fs.readFileSync(new URL('../dist/pc-portfolio.js',import.meta.url),'utf8');
-assert.ok(host.includes("fillText('SELECTED WORKS'"));assert.ok(host.includes('opacity<1||!roomWarmed'));
+assert.ok(host.includes("fillText('FEATURED WORKS'"));assert.ok(host.includes('opacity<1||!roomWarmed'));
 console.log('PASS: full-resolution intro, bounded 30fps monitor, offscreen suspension, stable adaptive room resolution and prewarm.');

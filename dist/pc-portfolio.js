@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.min.js';
-import {buildStudio,workStops,revealEffects} from './pc-portfolio-world.js?v=pc-main-11';
+import {buildStudio,workStops,revealEffects} from './pc-portfolio-world.js?v=featured-works-1';
 import {makePCMaterials} from './pc-new-materials.js?v=pc-new-1';
 import {attachLighting,defaults} from './pc-lighting.js?v=motion-1';
 import {createPCGlow} from './pc-new-glow.js?v=screen-colour-2';
@@ -16,7 +16,18 @@ export async function createStudio(canvas,assets,onProject,onAbout,onContact){
  const texture=new T.CanvasTexture(display);texture.colorSpace=T.SRGBColorSpace;texture.minFilter=T.LinearFilter;texture.generateMipmaps=false;
  const loader=new T.TextureLoader();
  const projectTextures=await Promise.all(workStops.map(async p=>{const source=await loader.loadAsync(`assets/${p.id}.webp`);const image=source.image,c=document.createElement('canvas');c.width=1280;c.height=720;const cc=c.getContext('2d');cc.fillStyle='#080808';cc.fillRect(0,0,1280,720);const scale=Math.min(1280/image.width,720/image.height);cc.drawImage(image,(1280-image.width*scale)/2,(720-image.height*scale)/2,image.width*scale,image.height*scale);source.dispose();const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;return tex;}));
- const labelTextures=workStops.map((p,i)=>{const c=document.createElement('canvas');c.width=1024;c.height=124;const c2=c.getContext('2d');c2.fillStyle='#fcbf10';c2.font='bold 47px Arial';c2.fillText(`0${i+1}`,0,49);c2.fillStyle='#ffeeba';c2.font='bold 42px Arial';c2.fillText(p.title,96,49);c2.fillStyle='#bdb693';c2.font='19px monospace';c2.fillText(p.tag,98,91);const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;return tex;});
+ const labelTextures=workStops.map(project=>{
+  const label=document.createElement('canvas');label.width=1160;label.height=168;
+  const context=label.getContext('2d');
+  context.fillStyle='#13110d';context.fillRect(0,0,label.width,label.height);
+  context.fillStyle='#fcbf10';context.fillRect(0,0,label.width,3);
+  context.font='24px monospace';context.fillText(project.tag,38,49);
+  context.fillStyle='#ffeeba';context.font='bold 52px Arial';context.fillText(project.title,38,123);
+  context.fillStyle='#fcbf10';context.font='bold 50px Arial';context.textAlign='right';
+  context.fillText('↗',label.width-38,120);
+  const texture=new T.CanvasTexture(label);texture.colorSpace=T.SRGBColorSpace;
+  return texture;
+ });
  const pc=document.createElement('canvas');pc.width=512;pc.height=1024;const pctx=pc.getContext('2d');
  pctx.fillStyle='#10130e';pctx.fillRect(0,0,512,1024);pctx.fillStyle='#fcbf10';pctx.fillRect(0,78,512,10);
  pctx.font='20px monospace';pctx.fillText('JAMU / CONTACT',42,139);
@@ -30,7 +41,10 @@ export async function createStudio(canvas,assets,onProject,onAbout,onContact){
  const bytes=await new Response(new Blob(parts).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
  const gltf=await new GLTFLoader().parseAsync(bytes,'');
  attachLighting(liveMaterials,meta)(lighting);
- const hc=document.createElement('canvas');hc.width=1536;hc.height=160;const hctx=hc.getContext('2d');hctx.fillStyle='#FFC00A';hctx.font='900 104px Arial';hctx.textBaseline='middle';hctx.textAlign='center';hctx.fillText('SELECTED WORKS',768,80);
+ const hc=document.createElement('canvas');hc.width=1160;hc.height=128;
+ const hctx=hc.getContext('2d');hctx.fillStyle='#fcbf10';hctx.fillRect(0,0,hc.width,hc.height);
+ hctx.fillStyle='#13110d';hctx.font='900 68px Arial';hctx.textBaseline='middle';
+ hctx.fillText('FEATURED WORKS',38,69);
  const headingTexture=new T.CanvasTexture(hc);headingTexture.colorSpace=T.SRGBColorSpace;
  const model=buildStudio({meta,liveMaterials,source:gltf.scene,clips:gltf.animations,screenTexture:texture,projectTextures,labelTextures,phoneTexture,headingTexture});
  const handoff=createOpeningHandoff(model.screen,texture);canvas.after(display);

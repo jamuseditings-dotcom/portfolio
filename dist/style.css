@@ -54,3 +54,15 @@ body:after{display:none}.reveal-caption{display:none}#prototype-label{opacity:.5
 .portfolio-page.desk-settled .header{opacity:1;visibility:visible;pointer-events:auto}
 .portfolio-page:after{display:none}
 .native-opening{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+
+/* The static gallery shares the studio wall's yellow header and dark captions. */
+#fallback-work{margin:64px 0 0;border-top:3px solid var(--yellow);padding:20px 0;color:var(--yellow);font:900 clamp(32px,6vw,72px)/1 Arial,sans-serif;text-transform:uppercase;letter-spacing:-.04em}
+.static-wall{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:8px 0 80px}
+.static-wall .static-project{display:grid;grid-template-rows:auto 1fr;align-items:start;margin:0;padding:0;transform:none;min-width:0;background:#13110d;border:1px solid #58471d;transition:border-color .2s}
+.static-wall .static-project:hover{border-color:var(--yellow)}
+.static-project img{aspect-ratio:16/10;background:#080808;width:100%;object-fit:contain}
+.static-project .static-project-caption{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:16px;border-top:2px solid var(--yellow)}
+.static-project .static-project-category{grid-column:1/-1;padding:0;color:var(--yellow);font-size:10px;text-transform:uppercase}
+.static-project-caption strong{font:700 clamp(16px,2.1vw,24px)/1.15 Arial,sans-serif}
+.static-project .static-project-arrow{padding:0;color:var(--yellow);font-size:18px}
+@media(max-width:700px){.static-wall{grid-template-columns:1fr}}
